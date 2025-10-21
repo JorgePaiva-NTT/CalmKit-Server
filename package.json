@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "build": "node build.mjs",
-    "start": "node dist/server.js"
+    "start-build": "node dist/server.js",
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",

@@ -24,6 +24,7 @@ app.use("/api/auth", require("./routes/auth"));
 app.use("/api/logs", require("./routes/logs"));
 app.use("/api/anchors", require("./routes/anchors"));
 app.use("/api/routines", require("./routes/routines"));
+app.use("/api/health", require("./routes/healthchecks"));
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, "127.0.0.1", () =>
