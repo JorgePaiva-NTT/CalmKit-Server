@@ -9,13 +9,13 @@ const { anchors: seedAnchors, routines: seedRoutines } = require("../calmData");
 // @route   POST api/auth/register
 // @desc    Register a user
 router.post("/register", async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, username } = req.body;
   try {
     let user = await User.findOne({ email });
     if (user) {
       return res.status(400).json({ msg: "User already exists" });
     }
-    user = new User({ email, password });
+    user = new User({ email, password, username });
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(password, salt);
     await user.save();
@@ -44,7 +44,10 @@ router.post("/register", async (req, res) => {
       { expiresIn: 360000 },
       (err, token) => {
         if (err) throw err;
-        res.json({ token });
+        res.json({
+          token,
+          user: { id: user.id, email: user.email, username: user.username },
+        });
       }
     );
   } catch (err) {
@@ -78,7 +81,10 @@ router.post("/login", async (req, res) => {
       { expiresIn: 360000 },
       (err, token) => {
         if (err) throw err;
-        res.json({ token });
+        res.json({
+          token,
+          user: { id: user.id, email: user.email, username: user.username },
+        });
       }
     );
   } catch (err) {
