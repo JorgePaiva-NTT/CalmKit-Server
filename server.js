@@ -24,8 +24,8 @@ app.use("/api/auth", require("./routes/auth"));
 app.use("/api/logs", require("./routes/logs"));
 app.use("/api/anchors", require("./routes/anchors"));
 app.use("/api/routines", require("./routes/routines"));
+app.use("/api/chat", require("./routes/chat"));
 app.use("/api/health", require("./routes/healthchecks"));
-app.use("/api/ai", require("./routes/ai"));
 
 const PORT = process.env.PORT || 5000;
 const HOST = process.env.HOST || "localhost"; // Use HOST from env, fallback to localhost
