@@ -15,7 +15,29 @@ router.get("/", auth, async (req, res) => {
     });
     res.json(anchors);
   } catch (err) {
-    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+// @route   POST api/anchors
+// @desc    Create a new anchor
+// @access  Private
+router.post("/", auth, async (req, res) => {
+  const { text, group } = req.body;
+
+  if (!text || !group) {
+    return res.status(400).json({ msg: "Please provide text and group" });
+  }
+
+  try {
+    const newAnchor = new Anchor({
+      user: req.user.id,
+      text,
+      group,
+    });
+    const anchor = await newAnchor.save();
+    res.json(anchor);
+  } catch (err) {
     res.status(500).send("Server Error");
   }
 });
@@ -68,6 +90,26 @@ router.post("/:id/toggle-favorite", auth, async (req, res) => {
     await anchor.save();
 
     res.json(anchor);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+// @route   DELETE api/anchors/:id
+// @desc    Delete an anchor
+// @access  Private
+router.delete("/:id", auth, async (req, res) => {
+  try {
+    let anchor = await Anchor.findById(req.params.id);
+    if (!anchor) {
+      return res.status(404).json({ msg: "Anchor not found" });
+    }
+    if (anchor.user.toString() !== req.user.id) {
+      return res.status(401).json({ msg: "Not authorized" });
+    }
+    await Anchor.deleteOne({ _id: req.params.id });
+    res.json({ msg: "Anchor removed" });
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");

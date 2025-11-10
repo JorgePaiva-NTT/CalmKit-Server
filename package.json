@@ -5,13 +5,15 @@
   "scripts": {
     "build": "node build.mjs",
     "start-build": "node dist/server.js",
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "HOST=0.0.0.0 node server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@google/genai": "^1.29.0",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",

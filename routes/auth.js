@@ -15,12 +15,13 @@ router.post("/register", async (req, res) => {
     if (user) {
       return res.status(400).json({ msg: "User already exists" });
     }
-    user = new User({ email, password, username });
+    user = new User({ email, password, username, avatarColor: randomColor() });
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(password, salt);
     await user.save();
 
-    const anchorCount = await Anchor.countDocuments();
+    // count the user anchors, if zero, seed the database
+    const anchorCount = await Anchor.countDocuments({ user: user.id });
     if (anchorCount === 0) {
       console.log("No anchors found, seeding database...");
       const anchorsToSeed = Object.entries(seedAnchors).flatMap(
@@ -46,7 +47,12 @@ router.post("/register", async (req, res) => {
         if (err) throw err;
         res.json({
           token,
-          user: { id: user.id, email: user.email, username: user.username },
+          user: {
+            id: user.id,
+            email: user.email,
+            username: user.username,
+            avatarColor: user.avatarColor,
+          },
         });
       }
     );
@@ -83,7 +89,12 @@ router.post("/login", async (req, res) => {
         if (err) throw err;
         res.json({
           token,
-          user: { id: user.id, email: user.email, username: user.username },
+          user: {
+            id: user.id,
+            email: user.email,
+            username: user.username,
+            avatarColor: user.avatarColor,
+          },
         });
       }
     );
@@ -92,5 +103,30 @@ router.post("/login", async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
+
+function randomColor() {
+  const colors = [
+    "#F44336", // Red
+    "#E91E63", // Pink
+    "#9C27B0", // Purple
+    "#673AB7", // Deep Purple
+    "#3F51B5", // Indigo
+    "#2196F3", // Blue
+    "#03A9F4", // Light Blue
+    "#00BCD4", // Cyan
+    "#009688", // Teal
+    "#4CAF50", // Green
+    "#8BC34A", // Light Green
+    "#CDDC39", // Lime
+    "#FFEB3B", // Yellow
+    "#FFC107", // Amber
+    "#FF9800", // Orange
+    "#FF5722", // Deep Orange
+    "#795548", // Brown
+    "#9E9E9E", // Grey
+    "#607D8B", // Blue Grey
+  ];
+  return colors[Math.floor(Math.random() * colors.length)];
+}
 
 module.exports = router;
