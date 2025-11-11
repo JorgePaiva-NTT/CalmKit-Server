@@ -2,7 +2,6 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv").config();
-const seedDatabase = require("./seed");
 
 const app = express();
 
@@ -11,13 +10,7 @@ app.use(cors());
 app.use(express.json());
 
 // Connect to DB
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("MongoDB Connected");
-    seedDatabase();
-  })
-  .catch((err) => console.log(err));
+mongoose.connect(process.env.MONGO_URI).catch((err) => console.log(err));
 
 // Define Routes
 app.use("/api/auth", require("./routes/auth"));
