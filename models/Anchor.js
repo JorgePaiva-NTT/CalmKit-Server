@@ -23,6 +23,10 @@ const AnchorSchema = new Schema({
     type: Number,
     default: null,
   },
+  isUserCreated: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 module.exports = mongoose.model("anchor", AnchorSchema);

@@ -32,6 +32,7 @@ router.post("/register", async (req, res) => {
             group,
             isFavorite: false,
             favoriteRank: null,
+            isUserCreated: false,
           }))
       );
       await Anchor.insertMany(anchorsToSeed);

@@ -34,6 +34,7 @@ router.post("/", auth, async (req, res) => {
       user: req.user.id,
       text,
       group,
+      isUserCreated: true,
     });
     const anchor = await newAnchor.save();
     res.json(anchor);
