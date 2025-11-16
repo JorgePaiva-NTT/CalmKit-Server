@@ -4,7 +4,32 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const Anchor = require("../models/Anchor");
-const { anchors: seedAnchors, routines: seedRoutines } = require("../calmData");
+const auth = require("../middleware/auth");
+const { anchors: seedAnchors } = require("../calmData");
+
+// @route   GET api/auth/me
+// @desc    Get current user data
+router.get("/me", auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+
+    res.json({
+      user: {
+        id: user._id,
+        email: user.email,
+        username: user.username,
+        avatarColor: user.avatarColor || "#4A9093",
+      },
+    });
+  } catch (err) {
+    console.error("Error fetching user:", err);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
 
 // @route   POST api/auth/register
 // @desc    Register a user

@@ -25,8 +25,7 @@ router.put("/avatar", auth, async (req, res) => {
     if (!color) {
       return res.status(400).json({ msg: "Color is required" });
     }
-    // Validate the color format (simple hex color code validation)
-    // allow name colors as well
+
     if (
       typeof color !== "string" ||
       !/^#([0-9A-F]{3}){1,2}$/i.test(color) ||
