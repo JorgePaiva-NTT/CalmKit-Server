@@ -9,6 +9,7 @@ const UserSchema = new mongoose.Schema({
   encSalt: { type: String }, // base64 salt for PBKDF2
   encVersion: { type: Number, default: 1 },
   encKey: { type: String }, // base64 encoded AES-256 key derived from passcode+encSalt
+  customFactors: { type: [String], default: [] },
 });
 
 module.exports = mongoose.model("User", UserSchema);
