@@ -99,6 +99,7 @@ router.get("/", auth, async (req, res) => {
           intensity: typeof doc.intensity === "number" ? doc.intensity : 5,
           anchor: doc.anchor || "",
           time: doc.time,
+          contributing: doc.contributing || [],
           moodScore: doc.moodScore,
         };
       }
@@ -121,6 +122,7 @@ router.post("/", auth, async (req, res) => {
       emotion = "",
       intensity = 5,
       anchor = "",
+      contributing = [],
       time,
     } = req.body || {};
     const user = await User.findById(req.user.id).lean();
@@ -131,6 +133,7 @@ router.post("/", auth, async (req, res) => {
       intensity:
         typeof intensity === "number" ? intensity : Number(intensity) || 5,
       anchor: String(anchor),
+      contributing: Array.isArray(contributing) ? contributing : [],
       time: time ? new Date(time) : new Date(),
     };
     const mood = calculateLogScore(plain.emotion, plain.intensity);
@@ -142,6 +145,7 @@ router.post("/", auth, async (req, res) => {
       doc.emotion = plain.emotion;
       doc.intensity = plain.intensity;
       doc.anchor = plain.anchor;
+      doc.contributing = plain.contributing;
     }
     const saved = await new Log(doc).save();
     res.json({ _id: saved._id, ...plain, moodScore: mood });
