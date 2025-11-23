@@ -2,13 +2,11 @@ const express = require("express");
 const router = express.Router();
 const auth = require("../middleware/auth");
 
-const Anchor = require("../models/AiSettings");
 const AiSettings = require("../models/AiSettings");
 
-// @route   GET api/ai-settings
-// @desc    Get AI settings for a user
-// @access  Private
 router.get("/", auth, async (req, res) => {
+  // #swagger.summary = 'Get AI settings'
+  // #swagger.tags = ['AI Settings']
   try {
     const aiSettings = await AiSettings.findOne();
     res.json(aiSettings);
@@ -17,19 +15,25 @@ router.get("/", auth, async (req, res) => {
   }
 });
 
-// @route  PUT api/ai-settings
-// @desc   Update AI settings for a user
-// @access Private
 router.put("/", auth, async (req, res) => {
+  // #swagger.tags = ['AI Settings']
+  // #swagger.summary = 'Update AI settings'
+  // #swagger.security = [{ "bearerAuth": [] }]
+  /* #swagger.parameters['body'] = {
+    in: 'body',
+    description: 'AI settings',
+    schema: {
+      model: 'gemini-2.5-flash',
+      temperature: 0.7,
+      topP: 0.9
+    }
+  } */
   const { model, temperature, topP } = req.body;
 
   try {
-    // get the first and only settings document
-    // same for all users
     let aiSettings = await AiSettings.findOne();
 
     if (aiSettings) {
-      // Update existing settings
       aiSettings.model = model || aiSettings.model;
       aiSettings.temperature = temperature || aiSettings.temperature;
       aiSettings.topP = topP || aiSettings.topP;
@@ -38,7 +42,6 @@ router.put("/", auth, async (req, res) => {
       return res.json(aiSettings);
     }
 
-    // Create new settings
     aiSettings = new AiSettings({
       user: req.user.id,
       model,
@@ -52,3 +55,5 @@ router.put("/", auth, async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
+
+module.exports = router;

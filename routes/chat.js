@@ -7,10 +7,24 @@ const AiSettings = require("../models/AiSettings");
 // Initialize the SDK with the API key from server environment variables
 const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-// @route   POST api/chat
-// @desc    Send a message to the AI
-// @access  Private (or Public if you remove auth)
 router.post("/", auth, async (req, res) => {
+  // #swagger.tags = ['Chat']
+  // #swagger.summary = 'Send message to AI coach'
+  // #swagger.security = [{ "bearerAuth": [] }]
+  /* #swagger.parameters['body'] = {
+    in: 'body',
+    description: 'Chat data',
+    required: true,
+    schema: {
+      message: 'How can I manage my anxiety?',
+      history: [],
+      logContext: {
+        emotion: 'Anxious',
+        intensity: 7,
+        trigger: 'Work meeting'
+      }
+    }
+  } */
   const { message, history, logContext } = req.body;
   const aiSettings = await AiSettings.findOne();
   if (!message) {
@@ -21,11 +35,11 @@ router.post("/", auth, async (req, res) => {
     const contents = [...(history || [])];
 
     if (logContext) {
-      const logTime = new Date(logContext.time).toLocaleString('en-US', {
-        dateStyle: 'long',
-        timeStyle: 'short'
+      const logTime = new Date(logContext.time).toLocaleString("en-US", {
+        dateStyle: "long",
+        timeStyle: "short",
       });
-      
+
       const contextParts = [
         `The user wants to discuss the following emotional log entry:`,
         `- Date/Time: ${logTime}`,
@@ -40,13 +54,17 @@ router.post("/", auth, async (req, res) => {
         contextParts.push(`- Anchor phrase they used: "${logContext.anchor}"`);
       }
       if (logContext.contributing && logContext.contributing.length > 0) {
-        contextParts.push(`- Contributing factors: ${logContext.contributing.join(', ')}`);
+        contextParts.push(
+          `- Contributing factors: ${logContext.contributing.join(", ")}`
+        );
       }
 
-      contextParts.push(`\nPlease help them reflect on and process this experience.`);
+      contextParts.push(
+        `\nPlease help them reflect on and process this experience.`
+      );
 
-      const contextMessage = contextParts.join('\n');
-      
+      const contextMessage = contextParts.join("\n");
+
       contents.push({ role: "user", parts: [{ text: contextMessage }] });
     }
 

@@ -3,19 +3,25 @@ const router = express.Router();
 const auth = require("../middleware/auth");
 const User = require("../models/User");
 
-const DEFAULT_FACTORS = ["Grateful", "Stressed", "Productive", "Tired", "Excited"];
+const DEFAULT_FACTORS = [
+  "Grateful",
+  "Stressed",
+  "Productive",
+  "Tired",
+  "Excited",
+];
 
-// @route   GET api/factors
-// @desc    Get all factors (default + custom)
-// @access  Private
 router.get("/", auth, async (req, res) => {
+  // #swagger.tags = ['Factors']
+  // #swagger.summary = 'Get all factors'
+  // #swagger.security = [{ "bearerAuth": [] }]
   try {
     const user = await User.findById(req.user.id).select("customFactors");
     if (!user) return res.status(404).json({ msg: "User not found" });
 
     res.json({
       defaultFactors: DEFAULT_FACTORS,
-      customFactors: user.customFactors || []
+      customFactors: user.customFactors || [],
     });
   } catch (err) {
     console.error(err.message);
@@ -23,10 +29,18 @@ router.get("/", auth, async (req, res) => {
   }
 });
 
-// @route   POST api/factors
-// @desc    Add a custom factor
-// @access  Private
 router.post("/", auth, async (req, res) => {
+  // #swagger.tags = ['Factors']
+  // #swagger.summary = 'Add a custom factor'
+  // #swagger.security = [{ "bearerAuth": [] }]
+  /* #swagger.parameters['body'] = {
+    in: 'body',
+    description: 'Factor data',
+    required: true,
+    schema: {
+      factor: 'Energized'
+    }
+  } */
   try {
     const { factor } = req.body;
     if (!factor || typeof factor !== "string" || !factor.trim()) {
@@ -36,7 +50,9 @@ router.post("/", auth, async (req, res) => {
     const trimmedFactor = factor.trim();
 
     if (DEFAULT_FACTORS.includes(trimmedFactor)) {
-      return res.status(400).json({ msg: "Factor already exists in default list" });
+      return res
+        .status(400)
+        .json({ msg: "Factor already exists in default list" });
     }
 
     const user = await User.findById(req.user.id);
@@ -51,7 +67,7 @@ router.post("/", auth, async (req, res) => {
 
     res.json({
       defaultFactors: DEFAULT_FACTORS,
-      customFactors: user.customFactors
+      customFactors: user.customFactors,
     });
   } catch (err) {
     console.error(err.message);

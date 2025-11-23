@@ -3,10 +3,10 @@ const router = express.Router();
 const auth = require("../middleware/auth");
 const User = require("../models/User");
 
-// @route   GET api/user/me
-// @desc    Get current user's info
-// @access  Private
 router.get("/me", auth, async (req, res) => {
+  // #swagger.tags = ['User']
+  // #swagger.summary = 'Get current user info'
+  // #swagger.security = [{ "bearerAuth": [] }]
   try {
     const user = await User.findById(req.user.id);
     res.json(user);
@@ -16,10 +16,18 @@ router.get("/me", auth, async (req, res) => {
   res.json({ user: req.user });
 });
 
-// @route   PUT api/user/avatar
-// @desc    Update user's avatar color
-// @access  Private
 router.put("/avatar", auth, async (req, res) => {
+  // #swagger.tags = ['User']
+  // #swagger.summary = 'Update avatar color'
+  // #swagger.security = [{ "bearerAuth": [] }]
+  /* #swagger.parameters['body'] = {
+    in: 'body',
+    description: 'Avatar data',
+    required: true,
+    schema: {
+      color: '#4A9093'
+    }
+  } */
   try {
     const { color } = req.body;
     if (!color) {

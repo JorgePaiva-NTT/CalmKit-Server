@@ -74,10 +74,21 @@ const calculateDailyMoodScore = (logs) => {
   return totalWeight > 0 ? weightedSum / totalWeight : null;
 };
 
-// @route   GET api/logs
-// @desc    Get all user's logs (optionally filtered by date range)
-// @access  Private
 router.get("/", auth, async (req, res) => {
+  // #swagger.tags = ['Logs']
+  // #swagger.summary = 'Get all user logs'
+  // #swagger.description = 'Get all emotion logs with optional date range filtering'
+  // #swagger.security = [{ "bearerAuth": [] }]
+  /* #swagger.parameters['startDate'] = {
+    in: 'query',
+    description: 'Filter logs from this date (ISO 8601)',
+    type: 'string'
+  } */
+  /* #swagger.parameters['endDate'] = {
+    in: 'query', 
+    description: 'Filter logs until this date (ISO 8601)',
+    type: 'string'
+  } */
   try {
     const { startDate, endDate } = req.query;
 
@@ -128,10 +139,22 @@ router.get("/", auth, async (req, res) => {
   }
 });
 
-// @route   POST api/logs
-// @desc    Add new log
-// @access  Private
 router.post("/", auth, async (req, res) => {
+  // #swagger.tags = ['Logs']
+  // #swagger.summary = 'Add new emotion log'
+  // #swagger.security = [{ "bearerAuth": [] }]
+  /* #swagger.parameters['body'] = {
+    in: 'body',
+    description: 'Log data',
+    schema: {
+      trigger: 'Meeting with boss',
+      emotion: 'Anxious',
+      intensity: 7,
+      anchor: 'I am grounded',
+      contributing: ['Stressed', 'Tired'],
+      time: '2024-01-01T12:00:00.000Z'
+    }
+  } */
   try {
     const {
       trigger = "",
@@ -171,10 +194,16 @@ router.post("/", auth, async (req, res) => {
   }
 });
 
-// @route   DELETE api/logs/:id
-// @desc    Delete a log
-// @access  Private
 router.delete("/:id", auth, async (req, res) => {
+  // #swagger.tags = ['Logs']
+  // #swagger.summary = 'Delete a log'
+  // #swagger.security = [{ "bearerAuth": [] }]
+  /* #swagger.parameters['id'] = {
+    in: 'path',
+    description: 'Log ID',
+    required: true,
+    type: 'string'
+  } */
   try {
     let log = await Log.findById(req.params.id);
     if (!log) return res.status(404).json({ msg: "Log not found" });
@@ -192,10 +221,23 @@ router.delete("/:id", auth, async (req, res) => {
   }
 });
 
-// @route   GET api/logs/mood-trends/:year/:month
-// @desc    Get daily logs detailed information for a specific month
-// @access  Private
 router.get("/mood-trends/:year/:month", auth, async (req, res) => {
+  // #swagger.tags = ['Logs']
+  // #swagger.summary = 'Get daily mood trends for a specific month'
+  // #swagger.description = 'Get daily logs and mood scores for calendar view'
+  // #swagger.security = [{ "bearerAuth": [] }]
+  /* #swagger.parameters['year'] = {
+    in: 'path',
+    description: 'Year (e.g., 2024)',
+    required: true,
+    type: 'integer'
+  } */
+  /* #swagger.parameters['month'] = {
+    in: 'path',
+    description: 'Month (1-12)',
+    required: true,
+    type: 'integer'
+  } */
   try {
     const { year, month } = req.params;
     const startDate = new Date(year, month - 1, 1);

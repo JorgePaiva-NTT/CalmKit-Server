@@ -129,10 +129,20 @@ async function startReencryptJob(jobId, userId, oldKey, newKey) {
   await job.save();
 }
 
-// @route   PUT /api/passphrase
-// @desc    Trigger server-side re-encryption of all user logs with new passcode
-// @access  Private
 router.put("/", auth, async (req, res) => {
+  // #swagger.tags = ['Passphrase']
+  // #swagger.summary = 'Update passphrase and re-encrypt logs'
+  // #swagger.description = 'Trigger server-side re-encryption of all user logs'
+  // #swagger.security = [{ "bearerAuth": [] }]
+  /* #swagger.parameters['body'] = {
+    in: 'body',
+    description: 'Passphrase data',
+    required: true,
+    schema: {
+      passcode: '1234',
+      clientSalt: 'base64string'
+    }
+  } */
   try {
     const { passcode, clientSalt } = req.body || {};
     if (!/^[0-9]{4}$/.test(String(passcode || "").trim())) {
@@ -186,10 +196,11 @@ router.put("/", auth, async (req, res) => {
   }
 });
 
-// @route   GET /api/passphrase/status
-// @desc    Get the latest passphrase migration job status for the current user
-// @access  Private
 router.get("/status", auth, async (req, res) => {
+  // #swagger.tags = ['Passphrase']
+  // #swagger.summary = 'Get passphrase migration job status'
+  // #swagger.description = 'Get the latest passphrase migration job status'
+  // #swagger.security = [{ "bearerAuth": [] }]
   try {
     const job = await PassphraseJob.findOne({ user: req.user.id })
       .sort({ createdAt: -1 })

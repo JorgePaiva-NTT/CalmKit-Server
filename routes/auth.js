@@ -7,9 +7,10 @@ const Anchor = require("../models/Anchor");
 const auth = require("../middleware/auth");
 const { anchors: seedAnchors } = require("../calmData");
 
-// @route   GET api/auth/me
-// @desc    Get current user data
 router.get("/me", auth, async (req, res) => {
+  // #swagger.tags = ['Authentication']
+  // #swagger.summary = 'Get current user data'
+  // #swagger.security = [{ "bearerAuth": [] }]
   try {
     const user = await User.findById(req.user.id).select("-password");
 
@@ -31,9 +32,20 @@ router.get("/me", auth, async (req, res) => {
   }
 });
 
-// @route   POST api/auth/register
-// @desc    Register a user
 router.post("/register", async (req, res) => {
+  // #swagger.tags = ['Authentication']
+  // #swagger.summary = 'Register a new user'
+  // #swagger.description = 'Create a new user account and receive JWT token'
+  /* #swagger.parameters['body'] = {
+    in: 'body',
+    description: 'User registration info',
+    required: true,
+    schema: {
+      email: 'user@example.com',
+      password: 'password123',
+      username: 'johndoe'
+    }
+  } */
   const { email, password, username } = req.body;
   try {
     let user = await User.findOne({ email });
@@ -88,9 +100,18 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// @route   POST api/auth/login
-// @desc    Authenticate user & get token
 router.post("/login", async (req, res) => {
+  // #swagger.tags = ['Authentication']
+  // #swagger.summary = 'Authenticate user and get JWT token'
+  /* #swagger.parameters['body'] = {
+    in: 'body',
+    description: 'Login credentials',
+    required: true,
+    schema: {
+      email: 'user@example.com',
+      password: 'password123'
+    }
+  } */
   const { email, password } = req.body;
   try {
     // 1. Find user by email

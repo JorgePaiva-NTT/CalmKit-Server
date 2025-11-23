@@ -1,0 +1,1165 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "CalmKit API",
+    "description": "Mental wellness app API with emotion logging, AI coaching, anchor phrases, and guided routines",
+    "version": "1.0.0"
+  },
+  "host": "localhost:3001",
+  "basePath": "/",
+  "schemes": ["http"],
+  "securityDefinitions": {
+    "bearerAuth": {
+      "type": "apiKey",
+      "name": "x-auth-token",
+      "in": "header",
+      "description": "JWT token for authentication"
+    }
+  },
+  "paths": {
+    "/api/auth/me": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Get current user data",
+        "description": "",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Register a new user",
+        "description": "Create a new user account and receive JWT token",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "User registration info",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "example": "user@example.com"
+                },
+                "password": {
+                  "type": "string",
+                  "example": "password123"
+                },
+                "username": {
+                  "type": "string",
+                  "example": "johndoe"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Authenticate user and get JWT token",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Login credentials",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "example": "user@example.com"
+                },
+                "password": {
+                  "type": "string",
+                  "example": "password123"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/logs/": {
+      "get": {
+        "tags": ["Logs"],
+        "summary": "Get all user logs",
+        "description": "Get all emotion logs with optional date range filtering",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "description": "Filter logs from this date (ISO 8601)",
+            "type": "string"
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "description": "Filter logs until this date (ISO 8601)",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": ["Logs"],
+        "summary": "Add new emotion log",
+        "description": "",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Log data",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "trigger": {
+                  "type": "string",
+                  "example": "Meeting with boss"
+                },
+                "emotion": {
+                  "type": "string",
+                  "example": "Anxious"
+                },
+                "intensity": {
+                  "type": "number",
+                  "example": 7
+                },
+                "anchor": {
+                  "type": "string",
+                  "example": "I am grounded"
+                },
+                "contributing": {
+                  "type": "array",
+                  "example": ["Stressed", "Tired"],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "time": {
+                  "type": "string",
+                  "example": "2024-01-01T12:00:00.000Z"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/logs/{id}": {
+      "delete": {
+        "tags": ["Logs"],
+        "summary": "Delete a log",
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Log ID"
+          },
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/logs/mood-trends/{year}/{month}": {
+      "get": {
+        "tags": ["Logs"],
+        "summary": "Get daily mood trends for a specific month",
+        "description": "Get daily logs and mood scores for calendar view",
+        "parameters": [
+          {
+            "name": "year",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "Year (e.g., 2024)"
+          },
+          {
+            "name": "month",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "Month (1-12)"
+          },
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/anchors/": {
+      "get": {
+        "tags": ["Anchors"],
+        "summary": "Get all anchors for a user",
+        "description": "",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": ["Anchors"],
+        "summary": "Create a new anchor phrase",
+        "description": "",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Anchor data",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "example": "I am grounded in this moment"
+                },
+                "group": {
+                  "type": "string",
+                  "example": "Grounding"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/anchors/{id}/toggle-favorite": {
+      "post": {
+        "tags": ["Anchors"],
+        "summary": "Toggle anchor favorite status",
+        "description": "Add or remove anchor from favorites (max 3, FIFO)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Anchor ID"
+          },
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/anchors/{id}": {
+      "delete": {
+        "tags": ["Anchors"],
+        "summary": "Delete an anchor",
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Anchor ID"
+          },
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/routines/": {
+      "get": {
+        "tags": ["Routines"],
+        "summary": "Get all routines",
+        "description": "",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": ["Routines"],
+        "summary": "Create a new routine",
+        "description": "",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Routine data",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "Deep Breathing"
+                },
+                "description": {
+                  "type": "string",
+                  "example": "A calming breathing exercise"
+                },
+                "icon": {
+                  "type": "string",
+                  "example": "🫁"
+                },
+                "tags": {
+                  "type": "array",
+                  "example": ["Breathing", "Quick"],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "steps": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "title": {
+                        "type": "string",
+                        "example": "Prepare"
+                      },
+                      "text": {
+                        "type": "string",
+                        "example": "Find a comfortable position"
+                      },
+                      "duration": {
+                        "type": "number",
+                        "example": 30
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/chat/": {
+      "post": {
+        "tags": ["Chat"],
+        "summary": "Send message to AI coach",
+        "description": "",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Chat data",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "How can I manage my anxiety?"
+                },
+                "history": {
+                  "type": "array",
+                  "example": [],
+                  "items": {}
+                },
+                "logContext": {
+                  "type": "object",
+                  "properties": {
+                    "emotion": {
+                      "type": "string",
+                      "example": "Anxious"
+                    },
+                    "intensity": {
+                      "type": "number",
+                      "example": 7
+                    },
+                    "trigger": {
+                      "type": "string",
+                      "example": "Work meeting"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/health/": {
+      "get": {
+        "tags": ["Health"],
+        "summary": "Health check endpoint",
+        "description": "Check API and database connectivity",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/passphrase/": {
+      "put": {
+        "tags": ["Passphrase"],
+        "summary": "Update passphrase and re-encrypt logs",
+        "description": "Trigger server-side re-encryption of all user logs",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Passphrase data",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "passcode": {
+                  "type": "string",
+                  "example": "1234"
+                },
+                "clientSalt": {
+                  "type": "string",
+                  "example": "base64string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Accepted"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/passphrase/status": {
+      "get": {
+        "tags": ["Passphrase"],
+        "summary": "Get passphrase migration job status",
+        "description": "Get the latest passphrase migration job status",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/factors/": {
+      "get": {
+        "tags": ["Factors"],
+        "summary": "Get all factors",
+        "description": "",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": ["Factors"],
+        "summary": "Add a custom factor",
+        "description": "",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Factor data",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "factor": {
+                  "type": "string",
+                  "example": "Energized"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/user/me": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Get current user info",
+        "description": "",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/user/avatar": {
+      "put": {
+        "tags": ["User"],
+        "summary": "Update avatar color",
+        "description": "",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Avatar data",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "color": {
+                  "type": "string",
+                  "example": "#4A9093"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/aiSettings/": {
+      "get": {
+        "tags": ["AI Settings"],
+        "summary": "Get AI settings",
+        "description": "",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "put": {
+        "tags": ["AI Settings"],
+        "summary": "Update AI settings",
+        "description": "",
+        "parameters": [
+          {
+            "name": "x-auth-token",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "AI settings",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "model": {
+                  "type": "string",
+                  "example": "gemini-2.5-flash"
+                },
+                "temperature": {
+                  "type": "number",
+                  "example": 0.7
+                },
+                "topP": {
+                  "type": "number",
+                  "example": 0.9
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "User": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "string"
+        },
+        "email": {
+          "type": "string",
+          "example": "user@example.com"
+        },
+        "username": {
+          "type": "string",
+          "example": "string"
+        },
+        "avatarColor": {
+          "type": "string",
+          "example": "#4A9093"
+        }
+      }
+    },
+    "Log": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string",
+          "example": "string"
+        },
+        "user": {
+          "type": "string",
+          "example": "string"
+        },
+        "trigger": {
+          "type": "string",
+          "example": "string"
+        },
+        "emotion": {
+          "type": "string",
+          "example": "Happy"
+        },
+        "intensity": {
+          "type": "number",
+          "example": 7
+        },
+        "anchor": {
+          "type": "string",
+          "example": "string"
+        },
+        "contributing": {
+          "type": "array",
+          "example": ["Grateful", "Stressed"],
+          "items": {
+            "type": "string"
+          }
+        },
+        "time": {
+          "type": "string",
+          "example": "2024-01-01T12:00:00.000Z"
+        },
+        "moodScore": {
+          "type": "number",
+          "example": 8.5
+        }
+      }
+    },
+    "Anchor": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string",
+          "example": "string"
+        },
+        "user": {
+          "type": "string",
+          "example": "string"
+        },
+        "text": {
+          "type": "string",
+          "example": "I am grounded in this moment"
+        },
+        "group": {
+          "type": "string",
+          "example": "Grounding"
+        },
+        "isFavorite": {
+          "type": "boolean",
+          "example": false
+        },
+        "favoriteRank": {},
+        "isUserCreated": {
+          "type": "boolean",
+          "example": false
+        }
+      }
+    },
+    "Routine": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string",
+          "example": "string"
+        },
+        "name": {
+          "type": "string",
+          "example": "Deep Breathing"
+        },
+        "description": {
+          "type": "string",
+          "example": "A calming breathing exercise"
+        },
+        "icon": {
+          "type": "string",
+          "example": "🫁"
+        },
+        "tags": {
+          "type": "array",
+          "example": ["Breathing", "Quick"],
+          "items": {
+            "type": "string"
+          }
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string",
+                "example": "Prepare"
+              },
+              "text": {
+                "type": "string",
+                "example": "Find a comfortable position"
+              },
+              "duration": {
+                "type": "number",
+                "example": 30
+              }
+            }
+          }
+        }
+      }
+    },
+    "Error": {
+      "type": "object",
+      "properties": {
+        "msg": {
+          "type": "string",
+          "example": "Error message"
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ]
+}

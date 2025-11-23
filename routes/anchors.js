@@ -4,10 +4,10 @@ const auth = require("../middleware/auth");
 
 const Anchor = require("../models/Anchor");
 
-// @route   GET api/anchors
-// @desc    Get all anchors for a user
-// @access  Private
 router.get("/", auth, async (req, res) => {
+  // #swagger.tags = ['Anchors']
+  // #swagger.summary = 'Get all anchors for a user'
+  // #swagger.security = [{ "bearerAuth": [] }]
   try {
     const anchors = await Anchor.find({ user: req.user.id }).sort({
       group: 1,
@@ -19,10 +19,19 @@ router.get("/", auth, async (req, res) => {
   }
 });
 
-// @route   POST api/anchors
-// @desc    Create a new anchor
-// @access  Private
 router.post("/", auth, async (req, res) => {
+  // #swagger.tags = ['Anchors']
+  // #swagger.summary = 'Create a new anchor phrase'
+  // #swagger.security = [{ "bearerAuth": [] }]
+  /* #swagger.parameters['body'] = {
+    in: 'body',
+    description: 'Anchor data',
+    required: true,
+    schema: {
+      text: 'I am grounded in this moment',
+      group: 'Grounding'
+    }
+  } */
   const { text, group } = req.body;
 
   if (!text || !group) {
@@ -43,10 +52,17 @@ router.post("/", auth, async (req, res) => {
   }
 });
 
-// @route   POST api/anchors/:id/toggle-favorite
-// @desc    Toggle an anchor's favorite status
-// @access  Private
 router.post("/:id/toggle-favorite", auth, async (req, res) => {
+  // #swagger.tags = ['Anchors']
+  // #swagger.summary = 'Toggle anchor favorite status'
+  // #swagger.description = 'Add or remove anchor from favorites (max 3, FIFO)'
+  // #swagger.security = [{ "bearerAuth": [] }]
+  /* #swagger.parameters['id'] = {
+    in: 'path',
+    description: 'Anchor ID',
+    required: true,
+    type: 'string'
+  } */
   try {
     const anchor = await Anchor.findOne({
       _id: req.params.id,
@@ -97,10 +113,16 @@ router.post("/:id/toggle-favorite", auth, async (req, res) => {
   }
 });
 
-// @route   DELETE api/anchors/:id
-// @desc    Delete an anchor
-// @access  Private
 router.delete("/:id", auth, async (req, res) => {
+  // #swagger.tags = ['Anchors']
+  // #swagger.summary = 'Delete an anchor'
+  // #swagger.security = [{ "bearerAuth": [] }]
+  /* #swagger.parameters['id'] = {
+    in: 'path',
+    description: 'Anchor ID',
+    required: true,
+    type: 'string'
+  } */
   try {
     let anchor = await Anchor.findById(req.params.id);
     if (!anchor) {

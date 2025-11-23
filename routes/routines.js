@@ -4,10 +4,10 @@ const Routine = require("../models/Routine");
 
 const auth = require("../middleware/auth");
 
-// @route   GET api/routines
-// @desc    Get all routines
-// @access  Public
 router.get("/", auth, async (req, res) => {
+  // #swagger.tags = ['Routines']
+  // #swagger.summary = 'Get all routines'
+  // #swagger.security = [{ "bearerAuth": [] }]
   try {
     const routines = await Routine.find().sort({ name: 1 });
     res.json(routines);
@@ -17,10 +17,22 @@ router.get("/", auth, async (req, res) => {
   }
 });
 
-// @route   POST api/routines
-// @desc    Create a new routine
-// @access  Private
 router.post("/", auth, async (req, res) => {
+  // #swagger.tags = ['Routines']
+  // #swagger.summary = 'Create a new routine'
+  // #swagger.security = [{ "bearerAuth": [] }]
+  /* #swagger.parameters['body'] = {
+    in: 'body',
+    description: 'Routine data',
+    required: true,
+    schema: {
+      name: 'Deep Breathing',
+      description: 'A calming breathing exercise',
+      icon: '🫁',
+      tags: ['Breathing', 'Quick'],
+      steps: [{ title: 'Prepare', text: 'Find a comfortable position', duration: 30 }]
+    }
+  } */
   const { name, tags, description, icon, steps } = req.body;
 
   if (!name || !steps) {
