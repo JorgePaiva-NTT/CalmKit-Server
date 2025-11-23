@@ -80,9 +80,9 @@ const calculateDailyMoodScore = (logs) => {
 router.get("/", auth, async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
-    
+
     const query = { user: req.user.id };
-    
+
     if (startDate || endDate) {
       query.time = {};
       if (startDate) {
@@ -94,7 +94,7 @@ router.get("/", auth, async (req, res) => {
         query.time.$lte = end;
       }
     }
-    
+
     const logs = await Log.find(query).sort({ time: -1 });
     const user = await User.findById(req.user.id).lean();
     let keyBuf = null;
@@ -193,7 +193,7 @@ router.delete("/:id", auth, async (req, res) => {
 });
 
 // @route   GET api/logs/mood-trends/:year/:month
-// @desc    Get daily mood scores for a specific month
+// @desc    Get daily logs detailed information for a specific month
 // @access  Private
 router.get("/mood-trends/:year/:month", auth, async (req, res) => {
   try {
@@ -219,12 +219,12 @@ router.get("/mood-trends/:year/:month", auth, async (req, res) => {
           plain = null;
         }
       }
-      
+
       if (!plain) {
         plain = {
           trigger: doc.trigger || "",
           emotion: doc.emotion || "",
-          intensity: typeof doc.intensity === "number" ? doc.intensity : 5,
+          intensity: typeof doc.intensity === "number" ? doc.intensity : 1,
           anchor: doc.anchor || "",
           time: doc.time,
           contributing: doc.contributing || [],
