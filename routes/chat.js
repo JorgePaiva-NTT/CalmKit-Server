@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { GoogleGenAI } = require("@google/genai");
-const auth = require("../middleware/auth"); // Assuming you want to keep it private
+const auth = require("../middleware/auth");
 const AiSettings = require("../models/AiSettings");
 
 // Initialize the SDK with the API key from server environment variables
@@ -11,19 +11,50 @@ const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 // @desc    Send a message to the AI
 // @access  Private (or Public if you remove auth)
 router.post("/", auth, async (req, res) => {
-  const { message, history } = req.body;
+  const { message, history, logContext } = req.body;
   const aiSettings = await AiSettings.findOne();
   if (!message) {
     return res.status(400).json({ msg: "Please provide a message" });
   }
 
   try {
+    const contents = [...(history || [])];
+
+    if (logContext) {
+      const logTime = new Date(logContext.time).toLocaleString('en-US', {
+        dateStyle: 'long',
+        timeStyle: 'short'
+      });
+      
+      const contextParts = [
+        `The user wants to discuss the following emotional log entry:`,
+        `- Date/Time: ${logTime}`,
+        `- Emotion: ${logContext.emotion}`,
+        `- Intensity: ${logContext.intensity}/10`,
+      ];
+
+      if (logContext.trigger) {
+        contextParts.push(`- What triggered this: ${logContext.trigger}`);
+      }
+      if (logContext.anchor) {
+        contextParts.push(`- Anchor phrase they used: "${logContext.anchor}"`);
+      }
+      if (logContext.contributing && logContext.contributing.length > 0) {
+        contextParts.push(`- Contributing factors: ${logContext.contributing.join(', ')}`);
+      }
+
+      contextParts.push(`\nPlease help them reflect on and process this experience.`);
+
+      const contextMessage = contextParts.join('\n');
+      
+      contents.push({ role: "user", parts: [{ text: contextMessage }] });
+    }
+
+    contents.push({ role: "user", parts: [{ text: message }] });
+
     const result = await genAI.models.generateContent({
       model: aiSettings ? aiSettings.model : "gemini-2.5-flash",
-      contents: [
-        ...(history || []),
-        { role: "user", parts: [{ text: message }] },
-      ],
+      contents,
       config: {
         systemInstruction: aiSettings.persona,
       },

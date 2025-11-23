@@ -75,11 +75,27 @@ const calculateDailyMoodScore = (logs) => {
 };
 
 // @route   GET api/logs
-// @desc    Get all user's logs
+// @desc    Get all user's logs (optionally filtered by date range)
 // @access  Private
 router.get("/", auth, async (req, res) => {
   try {
-    const logs = await Log.find({ user: req.user.id }).sort({ time: -1 });
+    const { startDate, endDate } = req.query;
+    
+    const query = { user: req.user.id };
+    
+    if (startDate || endDate) {
+      query.time = {};
+      if (startDate) {
+        query.time.$gte = new Date(startDate);
+      }
+      if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        query.time.$lte = end;
+      }
+    }
+    
+    const logs = await Log.find(query).sort({ time: -1 });
     const user = await User.findById(req.user.id).lean();
     let keyBuf = null;
     if (user?.encKey) keyBuf = b64decode(user.encKey);
@@ -190,8 +206,36 @@ router.get("/mood-trends/:year/:month", auth, async (req, res) => {
       time: { $gte: startDate, $lte: endDate },
     }).sort({ time: 1 });
 
+    const user = await User.findById(req.user.id).lean();
+    let keyBuf = null;
+    if (user?.encKey) keyBuf = b64decode(user.encKey);
+
+    const plainLogs = logs.map((doc) => {
+      let plain = null;
+      if (doc.cipher && keyBuf) {
+        try {
+          plain = decryptJSON(doc.cipher, keyBuf);
+        } catch (e) {
+          plain = null;
+        }
+      }
+      
+      if (!plain) {
+        plain = {
+          trigger: doc.trigger || "",
+          emotion: doc.emotion || "",
+          intensity: typeof doc.intensity === "number" ? doc.intensity : 5,
+          anchor: doc.anchor || "",
+          time: doc.time,
+          contributing: doc.contributing || [],
+          moodScore: doc.moodScore,
+        };
+      }
+      return { _id: doc._id, ...plain };
+    });
+
     const logsByDay = {};
-    logs.forEach((log) => {
+    plainLogs.forEach((log) => {
       const day = new Date(log.time).getDate();
       if (!logsByDay[day]) {
         logsByDay[day] = [];
