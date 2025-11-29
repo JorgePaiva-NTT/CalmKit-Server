@@ -6,6 +6,9 @@ const User = require("../models/User");
 const Anchor = require("../models/Anchor");
 const auth = require("../middleware/auth");
 const { anchors: seedAnchors } = require("../calmData");
+const { OAuth2Client } = require("google-auth-library");
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 router.get("/me", auth, async (req, res) => {
   // #swagger.tags = ['Authentication']
@@ -114,19 +117,16 @@ router.post("/login", async (req, res) => {
   } */
   const { email, password } = req.body;
   try {
-    // 1. Find user by email
     let user = await User.findOne({ email: { $eq: email } });
     if (!user) {
       return res.status(400).json({ msg: "Invalid credentials" });
     }
 
-    // 2. Compare password with bcrypt.compare()
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ msg: "Invalid credentials" });
     }
 
-    // 3. If valid, sign and return JWT
     const payload = { user: { id: user.id } };
     jwt.sign(
       payload,
@@ -150,6 +150,77 @@ router.post("/login", async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
+
+router.post("/google", async (req, res) => {
+  // #swagger.tags = ['Authentication']
+  // #swagger.summary = 'Authenticate with Google'
+  const { token } = req.body;
+  try {
+    const ticket = await googleClient.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const { email, name, sub: googleId } = ticket.getPayload();
+
+    let user = await User.findOne({ email });
+    if (user) {
+      if (!user.googleId) {
+        user.googleId = googleId;
+        await user.save();
+      }
+    } else {
+      user = new User({
+        email,
+        username: name,
+        googleId,
+        avatarColor: randomColor(),
+      });
+      await user.save();
+      await seedUserAnchors(user);
+    }
+
+    const payload = { user: { id: user.id } };
+    jwt.sign(
+      payload,
+      process.env.JWT_SECRET,
+      { expiresIn: 360000 },
+      (err, jwtToken) => {
+        if (err) throw err;
+        res.json({
+          token: jwtToken,
+          user: {
+            id: user.id,
+            email: user.email,
+            username: user.username,
+            avatarColor: user.avatarColor,
+          },
+        });
+      }
+    );
+  } catch (err) {
+    console.error("Google Auth Error:", err);
+    res.status(400).json({ msg: "Google authentication failed" });
+  }
+});
+
+async function seedUserAnchors(user) {
+  const anchorCount = await Anchor.countDocuments({ user: user.id });
+  if (anchorCount === 0) {
+    console.log("No anchors found, seeding database...");
+    const anchorsToSeed = Object.entries(seedAnchors).flatMap(([group, list]) =>
+      list.map((text) => ({
+        user: user.id,
+        text,
+        group,
+        isFavorite: false,
+        favoriteRank: null,
+        isUserCreated: false,
+      }))
+    );
+    await Anchor.insertMany(anchorsToSeed);
+    console.log("Anchors seeded successfully.");
+  }
+}
 
 function randomColor() {
   const colors = [

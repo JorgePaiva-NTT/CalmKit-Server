@@ -7,7 +7,9 @@
   },
   "host": "localhost:3001",
   "basePath": "/",
-  "schemes": ["http"],
+  "schemes": [
+    "http"
+  ],
   "securityDefinitions": {
     "bearerAuth": {
       "type": "apiKey",
@@ -19,7 +21,9 @@
   "paths": {
     "/api/auth/me": {
       "get": {
-        "tags": ["Authentication"],
+        "tags": [
+          "Authentication"
+        ],
         "summary": "Get current user data",
         "description": "",
         "parameters": [
@@ -52,7 +56,9 @@
     },
     "/api/auth/register": {
       "post": {
-        "tags": ["Authentication"],
+        "tags": [
+          "Authentication"
+        ],
         "summary": "Register a new user",
         "description": "Create a new user account and receive JWT token",
         "parameters": [
@@ -95,7 +101,9 @@
     },
     "/api/auth/login": {
       "post": {
-        "tags": ["Authentication"],
+        "tags": [
+          "Authentication"
+        ],
         "summary": "Authenticate user and get JWT token",
         "description": "",
         "parameters": [
@@ -132,9 +140,42 @@
         }
       }
     },
+    "/api/auth/google": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Authenticate with Google",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
     "/api/logs/": {
       "get": {
-        "tags": ["Logs"],
+        "tags": [
+          "Logs"
+        ],
         "summary": "Get all user logs",
         "description": "Get all emotion logs with optional date range filtering",
         "parameters": [
@@ -174,7 +215,9 @@
         ]
       },
       "post": {
-        "tags": ["Logs"],
+        "tags": [
+          "Logs"
+        ],
         "summary": "Add new emotion log",
         "description": "",
         "parameters": [
@@ -208,7 +251,10 @@
                 },
                 "contributing": {
                   "type": "array",
-                  "example": ["Stressed", "Tired"],
+                  "example": [
+                    "Stressed",
+                    "Tired"
+                  ],
                   "items": {
                     "type": "string"
                   }
@@ -241,7 +287,9 @@
     },
     "/api/logs/{id}": {
       "delete": {
-        "tags": ["Logs"],
+        "tags": [
+          "Logs"
+        ],
         "summary": "Delete a log",
         "description": "",
         "parameters": [
@@ -281,7 +329,9 @@
     },
     "/api/logs/mood-trends/{year}/{month}": {
       "get": {
-        "tags": ["Logs"],
+        "tags": [
+          "Logs"
+        ],
         "summary": "Get daily mood trends for a specific month",
         "description": "Get daily logs and mood scores for calendar view",
         "parameters": [
@@ -325,7 +375,9 @@
     },
     "/api/anchors/": {
       "get": {
-        "tags": ["Anchors"],
+        "tags": [
+          "Anchors"
+        ],
         "summary": "Get all anchors for a user",
         "description": "",
         "parameters": [
@@ -353,7 +405,9 @@
         ]
       },
       "post": {
-        "tags": ["Anchors"],
+        "tags": [
+          "Anchors"
+        ],
         "summary": "Create a new anchor phrase",
         "description": "",
         "parameters": [
@@ -405,7 +459,9 @@
     },
     "/api/anchors/{id}/toggle-favorite": {
       "post": {
-        "tags": ["Anchors"],
+        "tags": [
+          "Anchors"
+        ],
         "summary": "Toggle anchor favorite status",
         "description": "Add or remove anchor from favorites (max 3, FIFO)",
         "parameters": [
@@ -445,7 +501,9 @@
     },
     "/api/anchors/{id}": {
       "delete": {
-        "tags": ["Anchors"],
+        "tags": [
+          "Anchors"
+        ],
         "summary": "Delete an anchor",
         "description": "",
         "parameters": [
@@ -485,7 +543,9 @@
     },
     "/api/routines/": {
       "get": {
-        "tags": ["Routines"],
+        "tags": [
+          "Routines"
+        ],
         "summary": "Get all routines",
         "description": "",
         "parameters": [
@@ -513,7 +573,9 @@
         ]
       },
       "post": {
-        "tags": ["Routines"],
+        "tags": [
+          "Routines"
+        ],
         "summary": "Create a new routine",
         "description": "",
         "parameters": [
@@ -544,7 +606,10 @@
                 },
                 "tags": {
                   "type": "array",
-                  "example": ["Breathing", "Quick"],
+                  "example": [
+                    "Breathing",
+                    "Quick"
+                  ],
                   "items": {
                     "type": "string"
                   }
@@ -596,7 +661,9 @@
     },
     "/api/chat/": {
       "post": {
-        "tags": ["Chat"],
+        "tags": [
+          "Chat"
+        ],
         "summary": "Send message to AI coach",
         "description": "",
         "parameters": [
@@ -666,7 +733,9 @@
     },
     "/api/health/": {
       "get": {
-        "tags": ["Health"],
+        "tags": [
+          "Health"
+        ],
         "summary": "Health check endpoint",
         "description": "Check API and database connectivity",
         "responses": {
@@ -681,7 +750,9 @@
     },
     "/api/passphrase/": {
       "put": {
-        "tags": ["Passphrase"],
+        "tags": [
+          "Passphrase"
+        ],
         "summary": "Update passphrase and re-encrypt logs",
         "description": "Trigger server-side re-encryption of all user logs",
         "parameters": [
@@ -736,7 +807,9 @@
     },
     "/api/passphrase/status": {
       "get": {
-        "tags": ["Passphrase"],
+        "tags": [
+          "Passphrase"
+        ],
         "summary": "Get passphrase migration job status",
         "description": "Get the latest passphrase migration job status",
         "parameters": [
@@ -766,7 +839,9 @@
     },
     "/api/factors/": {
       "get": {
-        "tags": ["Factors"],
+        "tags": [
+          "Factors"
+        ],
         "summary": "Get all factors",
         "description": "",
         "parameters": [
@@ -797,7 +872,9 @@
         ]
       },
       "post": {
-        "tags": ["Factors"],
+        "tags": [
+          "Factors"
+        ],
         "summary": "Add a custom factor",
         "description": "",
         "parameters": [
@@ -848,7 +925,9 @@
     },
     "/api/user/me": {
       "get": {
-        "tags": ["User"],
+        "tags": [
+          "User"
+        ],
         "summary": "Get current user info",
         "description": "",
         "parameters": [
@@ -878,7 +957,9 @@
     },
     "/api/user/avatar": {
       "put": {
-        "tags": ["User"],
+        "tags": [
+          "User"
+        ],
         "summary": "Update avatar color",
         "description": "",
         "parameters": [
@@ -929,7 +1010,9 @@
     },
     "/api/aiSettings/": {
       "get": {
-        "tags": ["AI Settings"],
+        "tags": [
+          "AI Settings"
+        ],
         "summary": "Get AI settings",
         "description": "",
         "parameters": [
@@ -952,7 +1035,9 @@
         }
       },
       "put": {
-        "tags": ["AI Settings"],
+        "tags": [
+          "AI Settings"
+        ],
         "summary": "Update AI settings",
         "description": "",
         "parameters": [
@@ -1054,7 +1139,10 @@
         },
         "contributing": {
           "type": "array",
-          "example": ["Grateful", "Stressed"],
+          "example": [
+            "Grateful",
+            "Stressed"
+          ],
           "items": {
             "type": "string"
           }
@@ -1120,7 +1208,10 @@
         },
         "tags": {
           "type": "array",
-          "example": ["Breathing", "Quick"],
+          "example": [
+            "Breathing",
+            "Quick"
+          ],
           "items": {
             "type": "string"
           }
